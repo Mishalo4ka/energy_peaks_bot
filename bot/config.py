@@ -1,12 +1,13 @@
 from pydantic_settings import BaseSettings
-from pydantic import Field
 
 class Settings(BaseSettings):
-    BOT_TOKEN: str = Field(..., validation_alias="BOT_TOKEN")
+    BOT_TOKEN: str
+    DATABASE_URL: str
     
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",
+        "extra": "ignore"
     }
 
 

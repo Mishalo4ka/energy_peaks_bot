@@ -7,6 +7,8 @@ from keyboards import concentration_assessment, energy_assessment, menu, get_emp
 
 from states import EnergyAssessment
 
+from bot.database.session import AsyncSessionLocal
+from bot.services.energy_service import EnergyService
 
 router = Router()
 
@@ -77,6 +79,22 @@ async def get_employment_type(message: Message, state: FSMContext):
     data = await state.get_data()
     energy_score = data.get("energy_assessment")
     concentration_score = data.get("concentration_assessment")
+
+    try:
+        async with AsyncSessionLocal() as session:
+            await EnergyService.create_record(
+                session=session,
+                telegram_id=message.from_user.id,
+                username=message.from_user.username,
+                energy=energy_score,
+                concentration=concentration_score,
+                activity=employment_type,
+            )
+
+    except Exception as e:
+        await message.answer("Ошибка при сохранении данных.")
+        await state.clear()
+        raise e
 
     await message.answer(
         f"{html.bold('Получены оценки:')}\nЭнергия: {energy_score}\nКонцентрация: {concentration_score}\nКатегория: {employment_type}",

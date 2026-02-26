@@ -10,8 +10,11 @@ from aiogram.enums import ParseMode
 from config import settings
 from handlers import routers
 
+from database.setup import init_db
 
 async def main() -> None:
+    await init_db()
+    
     dp = Dispatcher()
      
     for router in routers:
